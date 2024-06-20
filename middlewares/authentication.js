@@ -1,7 +1,8 @@
 const {validateToken} = require('../services/authentication');
+const User = require('../modals/user');
 
 function checkForAuthenticationCookie(cookieName){
-    return(req,res,next)=>{
+    return async(req,res,next)=>{
         const tokenCookieValue = req.cookies[cookieName];
         if(!tokenCookieValue) {
             return next();
@@ -9,7 +10,8 @@ function checkForAuthenticationCookie(cookieName){
     
     try{
         const userPayload = validateToken(tokenCookieValue);
-        req.user = userPayload;
+        const user = await User.findById(userPayload._id);
+        req.user = user;
     }
     catch(e){}
     
