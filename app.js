@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const fs = require('fs');
 const path = require('path');
 const cookieParser = require('cookie-parser');   
 const { home } = require('nodemon/lib/utils');
@@ -13,6 +14,11 @@ const userRoute = require('./routes/user');
 const blogRoute = require('./routes/blog')
 
 const {checkForAuthenticationCookie} = require('./middlewares/authentication')
+
+const uploadsDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 const app = express();
 const PORT = process.env.PORT || 8000;
