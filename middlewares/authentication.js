@@ -1,22 +1,27 @@
-const {validateToken} = require('../services/authentication');
-const User = require('../modals/user');
+import User from '../modals/user.model.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import apiError from '../utils/apiError.js';
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv';
 
-function checkForAuthenticationCookie(cookieName){
-    return async(req,res,next)=>{
-        const tokenCookieValue = req.cookies[cookieName];
-        if(!tokenCookieValue) {
-            return next();
+dotenv.config();
+
+export const verifyJwt=asyncHandler(async (req,res,next)=>{
+    try {
+        const token = req.cookies.token;
+        const decodedToken= jwt.verify(token,process.env.SESSION_SECRET);
+        const user=await User.findById(decodedToken._id).select("-password");
+        if(!user){
+            throw new apiError(404,"not found");
         }
-    
-    try{
-        const userPayload = validateToken(tokenCookieValue);
-        const user = await User.findById(userPayload._id);
-        req.user = user;
+        req.user=user;
+        next();   
+    } catch (error) {
+        console.error(error)
+        if (error.name === "TokenExpiredError") {
+            res.clearCookie("accessToken"); 
+            throw new apiError(401, "Session expired. Please log in again.");
+        }
+        throw new apiError(404,"not found")
     }
-    catch(e){}
-    
-    next();
-}
-}
-
-module.exports = {checkForAuthenticationCookie};
+})

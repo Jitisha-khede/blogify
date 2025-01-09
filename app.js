@@ -1,54 +1,43 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const fs = require('fs');
-const path = require('path');
-const cookieParser = require('cookie-parser');   
-const { home } = require('nodemon/lib/utils');
+import express, { urlencoded } from 'express';
+import { connect } from 'mongoose';
+import { existsSync, mkdirSync } from 'fs';
+import cookieParser from 'cookie-parser';  
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-require('dotenv').config();
+dotenv.config();
+
 const mongoUrl = process.env.MONGO_URL;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const uploadsDir = join(__dirname, 'public', 'uploads');
 
-const Blog = require('./modals/blog');
-
-const userRoute = require('./routes/user');
-const blogRoute = require('./routes/blog')
-
-const {checkForAuthenticationCookie} = require('./middlewares/authentication')
-
-const uploadsDir = path.join(__dirname, 'public', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+if (!existsSync(uploadsDir)) {
+    mkdirSync(uploadsDir, { recursive: true });
 }
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
 try{
-    mongoose.connect(mongoUrl).then(()=>{
+    connect(mongoUrl).then(()=>{
         console.log('mongoDB connected');
     })
 }catch(e){
     console.log(e);
 }
 
-
-app.set('view engine','ejs');
-app.set('views',path.resolve('./views'));
-
-app.use(express.urlencoded({extended:false}));
+app.use(urlencoded({extended:false}));
 app.use(cookieParser());
-app.use(checkForAuthenticationCookie('token'));
-app.use(express.static(path.resolve('./public')));
+app.use(express.json());
+app.use(express.static(join(__dirname, 'public')));
 
-app.get('/',async (req,res)=>{
-    const allBlogs = await Blog.find({}); 
-    res.render('home',{
-        user: req.user,
-        blogs: allBlogs
-    });
-});
+//ROUTES
+import userRoute from './routes/user.routes.js';
+import blogRoute from './routes/blog.routes.js';
 
-app.use('/user',userRoute);
-app.use('/blog',blogRoute);
+app.use('/api/user',userRoute);
+app.use('/api/blog',blogRoute);
 
 app.listen(PORT,()=>console.log(`server started at port: ${PORT}`));

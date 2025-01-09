@@ -1,6 +1,10 @@
-const JWT = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-const secret = '$ecret@123';
+dotenv.config();
+const {sign, verify} = jwt;
+
+const secret = process.env.SESSION_SECRET;
 
 function createTokenForUser(user){
     const payload={
@@ -9,16 +13,16 @@ function createTokenForUser(user){
         profileImageURL : user.profileImageURL,
         role : user.role
     };
-    const token = JWT.sign(payload,secret);
+    const token = sign(payload,secret,{ expiresIn: "2h" });
     return token
 }
 
 function validateToken(token){
-    const payload = JWT.verify(token,secret);
+    const payload = verify(token,secret);
     return payload;
 }
 
-module.exports = {
+export default {
     createTokenForUser,
     validateToken
 }
