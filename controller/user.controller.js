@@ -3,6 +3,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import apiResponse from '../utils/apiResponse.js';
 import User from '../modals/user.model.js';
 import uploadOnCloudinary from '../utils/uploadToCloudinary.js';
+import removeFromCloudinary from '../utils/deleteFromCloudinary.js'
 
 const signupUser = asyncHandler( async (req,res)=>{
     try{
@@ -156,25 +157,25 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 const updateProfilePhoto = asyncHandler(async (req, res) => {
     try {
         const userId = req.user._id;
-        const profilePhotoPath = req.file?.path;
+        const profileImagePath = req.file?.path;
         
-        if (!profilePhotoPath) {
+        if (!profileImagePath) {
             throw new apiError(409, "Profile photo is required.");
         }
         const user=await User.findById(userId)
         if(!user){
             throw new apiError(404,"user not found ")
         }
-       if (user.profilePhoto) {
-         const deletePhoto=await removeFromCloudinary(user.profilePhoto)
+       if (user.profileImage) {
+         const deletePhoto=await removeFromCloudinary(user.profileImage)
        }
-        const profilePhotoUrl = await uploadToCloudinary(profilePhotoPath);
-        if(!profilePhotoUrl){
+        const profileImageUrl = await uploadOnCloudinary(profileImagePath);
+        if(!profileImageUrl){
             throw new apiError(500,"error while uploading photo to server")
         }
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            { profilePhoto: profilePhotoUrl },
+            { profileImage: profileImageUrl },
             { new: true , select: '-password'}
         );
 

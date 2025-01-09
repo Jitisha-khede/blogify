@@ -48,4 +48,4 @@ const removeFromCloudinary = async (url, resourceType = "image") => {
     }
 };
 
-export { removeFromCloudinary };
+export default removeFromCloudinary ;

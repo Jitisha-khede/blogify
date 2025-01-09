@@ -19,6 +19,6 @@ router.route('/getAllUsers').get(verifyJwt,userController.getAllUsers);
 
 router.route('/updateUserDetails').patch(verifyJwt,userController.updateUserDetails);
 
-router.route('/updateProfilePhoto').patch(verifyJwt,userController.updateProfilePhoto);
+router.route('/updateProfilePhoto').patch(upload.single('profileImage'), verifyJwt,userController.updateProfilePhoto);
 
 export default router;
