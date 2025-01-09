@@ -46,6 +46,14 @@ const loginUser = asyncHandler( async(req,res)=>{
 
         const user=await User.findOne({email:email})
         const token = await User.matchPasswordAndGenerateToken(email,password);
+
+        res.cookie("token", token, {
+            httpOnly: true, 
+            secure: process.env.NODE_ENV === "production", 
+            sameSite: "strict", 
+            maxAge: 60 * 60 * 1000, 
+        });
+
         const loggedIn=await User.findById(user._id).select("-password -refreshToken")
         res.status(200).json(
             new apiResponse(200,{loggedIn},'user logged in successfully!')
@@ -117,7 +125,7 @@ const deleteUser = asyncHandler((req,res) => {
 const updateUserDetails = asyncHandler(async (req, res) => {
     try {
         const _id = req.user._id; 
-        const { name, email} = req.body;
+        const { fullName, email} = req.body;
         const existingUsersEmail = await User.find({
             $and: [{ email: email },  { _id: { $ne: _id } }]
         });
@@ -133,7 +141,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 
         const updatedUser = await User.findByIdAndUpdate(
             _id,
-            { $set: { name: name, email: email||"" } },
+            { $set: { fullName: fullName, email: email||"" } },
             { new: true }
         );
 

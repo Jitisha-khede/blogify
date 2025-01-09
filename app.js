@@ -28,7 +28,7 @@ try{
     console.log(e);
 }
 
-app.use(urlencoded({extended:false}));
+app.use(urlencoded({extended:true}));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.static(join(__dirname, 'public')));
