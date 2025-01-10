@@ -11,6 +11,7 @@ const blogSchema = new Schema({
     },
     coverImageUrl:{
         type: String,
+        default: process.env.DEFAULT_BLOG_IMAGE,
         required: false
     },
     tags: {

@@ -25,7 +25,7 @@ const userSchema = new Schema({
     },
     profileImage:{
         type:String,
-        default:'/images/default-user.png'
+        default:process.env.DEFAULT_USER_IMAGE
     },
     role:{
         type: String,

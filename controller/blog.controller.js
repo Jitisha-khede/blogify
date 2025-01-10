@@ -13,7 +13,7 @@ export const createBlog = asyncHandler(async (req,res)=>{
         throw new apiError(400,'Title and body are required!');
     }
 
-    let coverImage = '/images/default-blog-image.png';
+    let coverImage = process.env.DEFAULT_BLOG_IMAGE;
     if (req.file) {
         const coverImageUrl = req.file.path;
         coverImage = await uploadOnCloudinary(coverImageUrl);
@@ -78,7 +78,7 @@ export const updateBlog = asyncHandler(async (req,res) =>{
     if (req.file) {
         const coverImageUrl = req.file.path; 
         if (blog.coverImageUrl) {
-            const deletePhoto=await removeFromCloudinary(user.profileImage)
+            const deletePhoto=await removeFromCloudinary(blog.coverImageUrl)
         }
         coverImage = await uploadOnCloudinary(coverImageUrl); 
         if(!coverImage){

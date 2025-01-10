@@ -14,7 +14,7 @@ const signupUser = asyncHandler( async (req,res)=>{
         }
 
         const profileImagePath = req.file ? req.file.path : null;
-        const profileImage = profileImagePath ? await uploadOnCloudinary(profileImagePath):'/images/default-user.png';
+        const profileImage = profileImagePath ? await uploadOnCloudinary(profileImagePath):process.env.DEFAULT_USER_IMAGE;
 
         if (!profileImage) {
             throw new apiError(500, 'Error uploading profile image.');
