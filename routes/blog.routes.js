@@ -1,51 +1,20 @@
 import { Router } from 'express';
-import multer, { diskStorage } from 'multer';
-import { resolve } from 'path';
-
-import Blog from '../modals/blog.model.js';
+import { upload } from '../middlewares/multer.js';
 import Comment from '../modals/comment.model.js';
+import * as blogController from '../controller/blog.controller.js';
+import { verifyJwt } from '../middlewares/authentication.js';
 
 const router = Router();
 
-const storage = diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, resolve(`./public/uploads/`))
-    },
-    filename: function (req, file, cb) {
-      const fileName =`${Date.now()}-${file.originalname}`;
-      cb(null,fileName); 
-    }
-  })
-  
-  const upload = multer({ storage: storage })
+router.route('/createBlog').post(verifyJwt,upload.single('coverImage') ,blogController.createBlog);
 
-router.get('/add-new',(req,res)=>{
-    return res.render('addBlog',{
-        user: req.user,
-    })
-})
+router.route('/updateBlog/:blogId').patch(verifyJwt,upload.single('coverImage'), blogController.updateBlog);
 
-router.post('/',upload.single('coverImage') ,async (req,res)=>{
-    const {title,body} = req.body;
-    const blog = await Blog.create({
-        body,
-        title,
-        createdBy:req.user._id,
-        coverImageUrl:`/uploads/${req.file.filename}`
-    })
-    return res.redirect(`/blog/${blog._id}`);
-});
+router.route('/getBlogById/:blogId').get(verifyJwt,blogController.getBlogById);
 
-router.get('/:id',async (req,res)=>{
-  const blog = await Blog.findById(req.params.id).populate('createdBy');
-  const comments = await Comment.find({blogId: req.params.id}).populate('createdBy'); 
+router.route('/getAllBlogs').get(verifyJwt,blogController.getAllBlogs);
 
-  return res.render('blog',{
-    user: req.user,
-    blog,
-    comments
-  })
-});
+router.route('/deleteBlog/:blogId').delete(verifyJwt,blogController.deleteBlog);
 
 router.post('/comment/:blogId',async (req,res)=>{
   await Comment.create({

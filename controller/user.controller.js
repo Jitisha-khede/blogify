@@ -47,7 +47,6 @@ const loginUser = asyncHandler( async(req,res)=>{
 
         const user=await User.findOne({email:email})
         const token = await User.matchPasswordAndGenerateToken(email,password);
-
         res.cookie("token", token, {
             httpOnly: true, 
             secure: process.env.NODE_ENV === "production", 
@@ -146,7 +145,7 @@ const updateUserDetails = asyncHandler(async (req, res) => {
             { new: true }
         );
 
-        return res.status(201).json(new apiResponse(201, updatedUser, "User details updated successfully."));
+        res.status(201).json(new apiResponse(201, updatedUser, "User details updated successfully."));
     } 
     catch (error) {
         console.error("Error updating user details:", error.message);
