@@ -140,3 +140,51 @@ export const deleteBlog = asyncHandler(async (req,res) => {
         new apiResponse(200,{},'Blog deleted sucessfully!')
     );
 });
+
+export const voteBlog = asyncHandler(async (req,res) => {
+    const { blogId,voteType } = req.body;
+    const userId = req.user._id;
+
+    const blog = await Blog.findById(blogId);
+    console.log(blogId);
+    if(!blog){
+        throw new apiError (404,'Blog not found');
+    }
+
+    blog.upvotes = blog.upvotes.filter((id) => id.toString() !== userId.toString());
+    blog.downvotes = blog.downvotes.filter((id) => id.toString() !== userId.toString());
+
+    if (voteType === 'upvote') {
+        blog.upvotes.push(userId);
+    } else if (voteType === 'downvote') {
+        blog.downvotes.push(userId);
+    } else {
+        throw new apiError(400, 'Invalid vote type');
+    }
+
+    await blog.save();
+
+    res.status(200).json(
+        new apiResponse(200,{
+            upvotesCount: blog.upvotes.length,
+            downvotesCount: blog.downvotes.length,
+        },'vote updated successfully!')
+    )
+});
+
+export const getBlogVotes = asyncHandler(async (req,res) => {
+    const { blogId } = req.params;
+
+    const blog = await Blog.findById(blogId);
+    console.log(blog)
+    if(!blog){
+        throw new apiError (404,'Blog not found')
+    }
+
+    res.status(200).json(
+        new apiResponse(200,{
+            upvotesCount: blog.upvotes.length,
+            downvotesCount: blog.downvotes.length,
+        },'votes fetched successfully!')
+    )
+})

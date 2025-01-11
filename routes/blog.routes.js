@@ -16,6 +16,10 @@ router.route('/getAllBlogs').get(verifyJwt,blogController.getAllBlogs);
 
 router.route('/deleteBlog/:blogId').delete(verifyJwt,blogController.deleteBlog);
 
+router.route('/voteBlog').post(verifyJwt,blogController.voteBlog);
+
+router.route('/getBlogVotes/:blogId').get(verifyJwt,blogController.getBlogVotes);
+
 router.post('/comment/:blogId',async (req,res)=>{
   await Comment.create({
     content: req.body.content,

@@ -21,8 +21,18 @@ const blogSchema = new Schema({
     createdBy:{
         type: Schema.Types.ObjectId,
         ref: 'user'
-    }
+    },
+    upvotes: [
+        { 
+            type: mongoose.Schema.Types.ObjectId, ref: 'user'
+        }
+    ], 
+    downvotes: [
+        {
+            type: mongoose.Schema.Types.ObjectId, ref: 'user' 
+        }
+    ],
 },{timestamps: true});
 
-const Blog = mongoose.model('blog',blogSchema);
+const Blog = mongoose.model('Blog',blogSchema);
 export default Blog;
