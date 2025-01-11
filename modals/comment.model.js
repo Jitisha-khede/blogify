@@ -1,20 +1,34 @@
 import { Schema, default as mongoose } from 'mongoose';
 
 const commentSchema = new Schema({
+    user:{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    blogId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Blog'
+    },
     content: {
         type: String,
         required : true
     },
-    blogId:{
+    parentComment: {
         type: Schema.Types.ObjectId,
-        ref: 'blog'
+        ref: 'Comment',
+        default: null
     },
-    createdBy:{
+    replyToUser: {
         type: Schema.Types.ObjectId,
-        ref: 'user'
+        ref: 'User'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
+    
 }, {timestamps: true});
 
-const Comment = mongoose.model('comment',commentSchema);
+const Comment = mongoose.model('Comment',commentSchema);
 
 export default Comment;

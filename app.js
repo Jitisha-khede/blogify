@@ -36,8 +36,12 @@ app.use(express.static(join(__dirname, 'public')));
 //ROUTES
 import userRoute from './routes/user.routes.js';
 import blogRoute from './routes/blog.routes.js';
+import searchRoute from './routes/search.routes.js';
+import commentRoute from './routes/comment.routes.js';
 
 app.use('/api/user',userRoute);
 app.use('/api/blog',blogRoute);
+app.use('/api',searchRoute);
+app.use('/api/comment',commentRoute);
 
 app.listen(PORT,()=>console.log(`server started at port: ${PORT}`));
