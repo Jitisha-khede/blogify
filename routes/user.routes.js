@@ -21,4 +21,6 @@ router.route('/updateUserDetails').patch(verifyJwt,userController.updateUserDeta
 
 router.route('/updateProfilePhoto').patch(upload.single('profileImage'), verifyJwt,userController.updateProfilePhoto);
 
+router.route('/countStreak').get(verifyJwt,userController.countStreak);
+
 export default router;

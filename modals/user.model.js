@@ -34,6 +34,13 @@ const userSchema = new Schema({
             ref: 'Blog'
         }
     ],
+    streak: {
+        type: Number,
+        default: 0
+    },
+    lastReadDate: {
+        type: Date
+    },
     role:{
         type: String,
         enum:['USER','ADMIN'],

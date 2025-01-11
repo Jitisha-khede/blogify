@@ -188,4 +188,42 @@ const updateProfilePhoto = asyncHandler(async (req, res) => {
     }
 });
 
-export default { loginUser,logoutUser, signupUser, getUserDetails, deleteUser, getAllUsers, updateUserDetails, updateProfilePhoto };
+const countStreak = asyncHandler(async(req,res) => {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+    if(!user){
+        throw new apiError(400,'No user found!');
+    }
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const lastReadDate = user.lastReadDate;
+    if (lastReadDate) {
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1); 
+        
+        if (lastReadDate.getDate() === yesterday.getDate() && 
+            lastReadDate.getMonth() === yesterday.getMonth() && 
+            lastReadDate.getFullYear() === yesterday.getFullYear()) {
+            
+            user.streak += 1; 
+        } else {
+            user.streak = 1; 
+        }
+    } else {
+        user.streak = 1;
+    }
+
+    user.lastReadDate = today;
+    if (user.isModified('streak')) { 
+        await user.save();
+    }
+
+    res.status(200).json(
+        new apiResponse(200, { streak: user.streak }, 'Streak updated successfully!')
+    );
+});
+
+export default { loginUser,logoutUser, signupUser, getUserDetails, deleteUser, getAllUsers, updateUserDetails, updateProfilePhoto, countStreak };
