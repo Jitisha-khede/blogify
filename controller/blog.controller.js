@@ -146,7 +146,7 @@ export const voteBlog = asyncHandler(async (req,res) => {
     const userId = req.user._id;
 
     const blog = await Blog.findById(blogId);
-    console.log(blogId);
+
     if(!blog){
         throw new apiError (404,'Blog not found');
     }
