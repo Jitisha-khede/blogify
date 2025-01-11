@@ -7,7 +7,7 @@ import Blog from '../modals/blog.model.js';
 import User from '../modals/user.model.js';
 
 export const createBlog = asyncHandler(async (req,res)=>{
-    const {title,body, tags} = req.body;
+    const {title,body, tags, moodCategory} = req.body;
 
     if(!title || !body){
         throw new apiError(400,'Title and body are required!');
@@ -23,10 +23,16 @@ export const createBlog = asyncHandler(async (req,res)=>{
         throw new apiError(500,'Error in uploading blog cover Image');
     }
 
+    const validCategories = ['Happy', 'Sad', 'Motivational', 'Inspiring', 'Exciting'];
+    if (!moodCategory.every(category => validCategories.includes(category))) {
+        throw new apiError(400, 'Invalid mood category');
+    }
+
     const blog = await Blog.create({
         body,
         title,
         tags: Array.isArray(tags) ? tags : [],
+        moodCategory,
         createdBy:req.user._id,
         coverImage
     })
@@ -54,7 +60,7 @@ export const updateBlog = asyncHandler(async (req,res) =>{
     const userId = req.user._id;
     const {blogId} = req.params;
 
-    const { title, body, tags} = req.body;
+    const { title, body, tags, mood} = req.body;
 
     if (!blogId) {
         throw new apiError(400, "Blog ID is required.");
@@ -86,9 +92,15 @@ export const updateBlog = asyncHandler(async (req,res) =>{
         }
     }
 
+    const validCategories = ['Happy', 'Sad', 'Motivational', 'Inspiring', 'Exciting'];
+    if (!mood.every(category => validCategories.includes(category))) {
+        throw new apiError(400, 'Invalid mood category');
+    }
+
     blog.title = title || blog.title;
     blog.body = body || blog.body;
     blog.coverImageUrl = coverImage;
+    blog.moodCategory = mood || blog.moodCategory;
 
     if (tags) {
         blog.tags = Array.isArray(tags) ? tags : tags.split(',').map(tag => tag.trim());
@@ -186,5 +198,30 @@ export const getBlogVotes = asyncHandler(async (req,res) => {
             upvotesCount: blog.upvotes.length,
             downvotesCount: blog.downvotes.length,
         },'votes fetched successfully!')
+    )
+});
+
+export const filterByMood = asyncHandler(async (req,res) => {
+    const { mood } = req.query;
+
+    if(!mood){
+        throw new apiError(400,'Mood categories are required!')
+    }
+
+    const categories = mood.split(',');
+
+    const validCategories = ['Happy', 'Sad', 'Motivational', 'Inspiring', 'Exciting'];
+    if(!categories.every(category => validCategories.includes(category))){
+        throw new apiError(400, 'invalid mood categories!')
+    }
+
+    const blogs = await Blog.find({ moodCategory: { $in: categories }});
+
+    if(!blogs.length){
+        throw new apiError(404,'No blogs found for the selected mood categories')
+    }
+
+    res.status(200).json(
+        new apiResponse(200, {blogs}, 'Blogs filtered by selected mood categories')
     )
 })

@@ -20,6 +20,8 @@ router.route('/voteBlog').post(verifyJwt,blogController.voteBlog);
 
 router.route('/getBlogVotes/:blogId').get(verifyJwt,blogController.getBlogVotes);
 
+router.route('/filterByMood').get(verifyJwt,blogController.filterByMood);
+
 router.post('/comment/:blogId',async (req,res)=>{
   await Comment.create({
     content: req.body.content,

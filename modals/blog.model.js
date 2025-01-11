@@ -18,6 +18,10 @@ const blogSchema = new Schema({
         type: [String], 
         default: []
     },
+    moodCategory: {
+        type: [String],
+        enum: ['Happy', 'Sad', 'Motivational', 'Inspiring', 'Exciting'],
+    },
     createdBy:{
         type: Schema.Types.ObjectId,
         ref: 'user'
