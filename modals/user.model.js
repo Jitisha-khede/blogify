@@ -1,7 +1,8 @@
 import { createHmac, randomBytes } from 'node:crypto';
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { model } from 'mongoose';
 import authentication from '../services/authentication.js';
+import { type } from 'node:os';
 
 const { createTokenForUser } = authentication
 
@@ -27,6 +28,12 @@ const userSchema = new Schema({
         type:String,
         default:process.env.DEFAULT_USER_IMAGE
     },
+    bookmarks :[
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Blog'
+        }
+    ],
     role:{
         type: String,
         enum:['USER','ADMIN'],
@@ -38,7 +45,7 @@ const userSchema = new Schema({
 
 userSchema.pre('save',function(next){
     const user = this;
-    if(!user.isModified('password')) return
+    if(!user.isModified('password')) return next();
 
     const salt = randomBytes(16).toString();
     const hashedPassword = createHmac('sha256',salt).update(user.password).digest("hex");
