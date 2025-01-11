@@ -38,8 +38,11 @@ export const addComment = asyncHandler(async (req,res) => {
 
 export const getComments = asyncHandler(async (req,res) => {
     const { blogId } = req.params;
+    const { sort = 'newest' } = req.query;
 
-    const comments = await Comment.find({blogId}).populate('user','fullName').populate('replyToUser','fullName').sort( {createdAt: -1} );
+    const sortOrder = sort === 'oldest' ? 1 : -1;
+
+    const comments = await Comment.find({blogId}).populate('user','fullName').populate('replyToUser','fullName').sort( {createdAt: sortOrder} );
 
     const structuredComments = comments.map((comment) => ({
         id: comment._id,
