@@ -12,7 +12,9 @@ router.route('/updateBlog/:blogId').patch(verifyJwt,upload.single('coverImage'),
 
 router.route('/getBlogById/:blogId').get(verifyJwt,blogController.getBlogById);
 
-router.route('/getAllBlogs').get(verifyJwt,blogController.getAllBlogs);
+router.route('/getUserBlogs').get(verifyJwt,blogController.getUserBlogs);
+
+router.route('/getAllBlogs').get(blogController.getAllBlogs);
 
 router.route('/deleteBlog/:blogId').delete(verifyJwt,blogController.deleteBlog);
 

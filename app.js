@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import cors from 'cors'
 
 dotenv.config();
 
@@ -27,6 +28,8 @@ try{
 }catch(e){
     console.log(e);
 }
+
+app.use(cors({ origin: 'http://localhost:3000', credentials: true })); 
 
 app.use(urlencoded({extended:true}));
 app.use(cookieParser());

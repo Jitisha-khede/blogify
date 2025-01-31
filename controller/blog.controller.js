@@ -43,6 +43,18 @@ export const createBlog = asyncHandler(async (req,res)=>{
 });
 
 export const getAllBlogs = asyncHandler(async (req,res) => {
+    const blogs = await Blog.find();
+
+    if(!blogs|| blogs.length === 0){
+        throw new apiError(404,'No blogs found for logged in user');
+    }
+
+    res.status(201).json(
+        new apiResponse(201,{blogs},'Blogs fetched successfully!')
+    )
+})
+
+export const getUserBlogs = asyncHandler(async (req,res) => {
     const userId = req.user._id;
 
     const blogs = await Blog.find({ createdBy: userId}).sort({createdAt: -1});
