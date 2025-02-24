@@ -13,9 +13,11 @@ router.route('/logout').get(verifyJwt,userController.logoutUser);
 
 router.route('/getUserDetails').get(verifyJwt,userController.getUserDetails);
 
+router.route('/getUserById/:id').get(userController.getUserById);
+
 router.route('/deleteUser').delete(verifyJwt,userController.deleteUser);
 
-router.route('/getAllUsers').get(verifyJwt,userController.getAllUsers);
+router.route('/getAllUsers').get(userController.getAllUsers);
 
 router.route('/updateUserDetails').patch(verifyJwt,userController.updateUserDetails);
 

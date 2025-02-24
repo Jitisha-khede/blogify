@@ -10,7 +10,9 @@ router.route('/createBlog').post(verifyJwt,upload.single('coverImage') ,blogCont
 
 router.route('/updateBlog/:blogId').patch(verifyJwt,upload.single('coverImage'), blogController.updateBlog);
 
-router.route('/getBlogById/:blogId').get(verifyJwt,blogController.getBlogById);
+router.route('/getUserBlogById/:blogId').get(verifyJwt,blogController.getUserBlogById);
+
+router.route('/getBlogById/:blogId').get(blogController.getBlogById);
 
 router.route('/getUserBlogs').get(verifyJwt,blogController.getUserBlogs);
 

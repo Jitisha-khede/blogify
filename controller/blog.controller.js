@@ -3,6 +3,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import apiResponse from '../utils/apiResponse.js';
 import uploadOnCloudinary from '../utils/uploadToCloudinary.js';
 import removeFromCloudinary from '../utils/deleteFromCloudinary.js'
+import Comment from '../modals/comment.model.js';
 import Blog from '../modals/blog.model.js';
 import User from '../modals/user.model.js';
 
@@ -49,8 +50,17 @@ export const getAllBlogs = asyncHandler(async (req,res) => {
         throw new apiError(404,'No blogs found for logged in user');
     }
 
+    const blogsWithComments = await Promise.all(
+        blogs.map(async (blog) => {
+            const commentCount = await Comment.countDocuments({ blogId: blog._id });
+            return { ...blog, commentCount }; // Add comment count
+        })
+    );
+
+    // console.log(blogsWithComments);
+
     res.status(201).json(
-        new apiResponse(201,{blogs},'Blogs fetched successfully!')
+        new apiResponse(201,{blogs: blogsWithComments},'Blogs fetched successfully!')
     )
 })
 
@@ -125,7 +135,7 @@ export const updateBlog = asyncHandler(async (req,res) =>{
     )
 });
 
-export const getBlogById = asyncHandler( async (req,res) => {
+export const getUserBlogById = asyncHandler( async (req,res) => {
     const {blogId} = req.params;
     const userId = req.user._id;
 
@@ -143,6 +153,20 @@ export const getBlogById = asyncHandler( async (req,res) => {
         new apiResponse(200,{blog},'Blog fetched successfully!')
     )
 })
+
+export const getBlogById = asyncHandler(async (req,res) => {
+    const { blogId } = req.params;
+
+    if(!blogId){
+        throw new apiError(400,'Blog ID is required');
+    }
+
+    const blog = await Blog.findById(blogId);
+
+    res.status(200).json(
+        new apiResponse(200,{blog},'Blog fetched successfully!')
+    )
+});
 
 export const deleteBlog = asyncHandler(async (req,res) => {
     const { blogId } = req.params;

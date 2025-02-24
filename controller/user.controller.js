@@ -99,6 +99,24 @@ const getUserDetails = asyncHandler(async(req,res) => {
       }
 });
 
+const getUserById = asyncHandler(async(req,res) => {
+    try{
+        const { id } = req.params;
+    const user =  await User.findById(id)
+    if(!user){
+        throw new apiError(404,'No user found with this id');
+    }
+    res.status(200).json(
+        new apiResponse(200,{user},'User retrived successfully!')
+    )
+    }
+    catch(error){   
+        console.error("Error retrieving courses:", error);
+        throw new apiError(error.statusCode||500,error.message||"internal server error")    
+    }
+});
+
+
 const getAllUsers = asyncHandler(async(req,res) => {
     const users = await User.find({});
     if(!users){
@@ -226,4 +244,4 @@ const countStreak = asyncHandler(async(req,res) => {
     );
 });
 
-export default { loginUser,logoutUser, signupUser, getUserDetails, deleteUser, getAllUsers, updateUserDetails, updateProfilePhoto, countStreak };
+export default { loginUser,logoutUser, signupUser, getUserDetails, getUserById, deleteUser, getAllUsers, updateUserDetails, updateProfilePhoto, countStreak };
