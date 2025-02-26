@@ -7,6 +7,10 @@ import { type } from 'node:os';
 const { createTokenForUser } = authentication
 
 const userSchema = new Schema({
+    userName:{
+        type: String,
+        required: true
+    },
     fullName:{
         type: String,
         required: true

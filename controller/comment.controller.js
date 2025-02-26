@@ -42,14 +42,18 @@ export const getComments = asyncHandler(async (req,res) => {
 
     const sortOrder = sort === 'oldest' ? 1 : -1;
 
-    const comments = await Comment.find({blogId}).populate('user','fullName').populate('replyToUser','fullName').sort( {createdAt: sortOrder} );
+    const comments = await Comment.find({blogId}).populate("user", "userName _id profileImage").populate('replyToUser','userName _id profileImage').sort( {createdAt: sortOrder} );
 
     const structuredComments = comments.map((comment) => ({
         id: comment._id,
         content: comment.content,
-        user: comment.user.id,
+        user: comment.user 
+        ? { id: comment.user._id, userName: comment.user.userName, profileImage: comment.user.profileImage }
+        : null,
         parentComment: comment.parentComment,
-        replyToUser: comment.replyToUser?.name || null,
+        replyToUser: comment.replyToUser 
+        ? { id: comment.replyToUser._id, userName: comment.replyToUser.userName, profileImage: comment.replyToUser.profileImage }
+        : null,
         blogId: comment.blogId,
         createdAt: comment.createdAt
     }));

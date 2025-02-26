@@ -144,7 +144,7 @@ export const getUserBlogById = asyncHandler( async (req,res) => {
     if(!blog){
         throw new apiError(404, 'No blog found with this id')
     }
-    console.log(blog);
+    // console.log(blog);
     if (blog.createdBy.toString() !== userId.toString()) {
         throw new apiError(403, 'You are not authorized to delete this blog');
     }
@@ -224,7 +224,7 @@ export const getBlogVotes = asyncHandler(async (req,res) => {
     const { blogId } = req.params;
 
     const blog = await Blog.findById(blogId);
-    console.log(blog)
+    // console.log(blog)
     if(!blog){
         throw new apiError (404,'Blog not found')
     }
