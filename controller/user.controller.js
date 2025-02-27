@@ -7,24 +7,25 @@ import removeFromCloudinary from '../utils/deleteFromCloudinary.js'
 
 const signupUser = asyncHandler( async (req,res)=>{
     try{
-        const { fullName, email, password } = req.body;
+        const { userName, fullName, email, password } = req.body;
 
-        if(!fullName || !email || !password) {
+        if(!userName || !fullName || !email || !password) {
             throw new apiError(400, 'Name Email and Password are required!')
         }
 
-        const profileImagePath = req.file ? req.file.path : null;
-        const profileImage = profileImagePath ? await uploadOnCloudinary(profileImagePath):process.env.DEFAULT_USER_IMAGE;
+        // const profileImagePath = req.file ? req.file.path : null;
+        // const profileImage = profileImagePath ? await uploadOnCloudinary(profileImagePath):process.env.DEFAULT_USER_IMAGE;
 
-        if (!profileImage) {
-            throw new apiError(500, 'Error uploading profile image.');
-        }
+        // if (!profileImage) {
+        //     throw new apiError(500, 'Error uploading profile image.');
+        // }
 
         const newUser = await User.create({
+            userName,
             fullName,
             email,
             password,
-            profileImage
+            // profileImage
         });
         
         res.status(201).json(
@@ -39,22 +40,31 @@ const signupUser = asyncHandler( async (req,res)=>{
 
 const loginUser = asyncHandler( async(req,res)=>{
     try{
-        const { email, password } = req.body;
-
-        if (!email || !password ) {
-            throw new apiError(500, 'email and password is required')
+        const { login, password } = req.body;
+        console.log(req.body);
+        if (!login || !password ) {
+            throw new apiError(500, 'Email/Username and password is required')
         }
 
-        const user=await User.findOne({email:email})
-        const token = await User.matchPasswordAndGenerateToken(email,password);
+        const user = await User.findOne({ 
+            $or: [{ email: login }, { userName: login }] 
+        });
+
+        if (!user) {
+            throw new apiError(404, 'User not found');
+        }
+
+        const token = await User.matchPasswordAndGenerateToken(user.email,password);
+        console.log(token); 
         res.cookie("token", token, {
             httpOnly: true, 
-            secure: process.env.NODE_ENV === "production", 
+            secure: false, 
             sameSite: "strict", 
             maxAge: 60 * 60 * 1000, 
         });
 
         const loggedIn=await User.findById(user._id).select("-password -refreshToken")
+        console.log(loggedIn);
         res.status(200).json(
             new apiResponse(200,{loggedIn},'user logged in successfully!')
         )
