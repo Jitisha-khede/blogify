@@ -220,6 +220,34 @@ export const voteBlog = asyncHandler(async (req,res) => {
     )
 });
 
+export const removeVote = asyncHandler(async (req, res) => {
+    const { blogId } = req.body;
+    const userId = req.user._id;
+
+    const blog = await Blog.findById(blogId);
+
+    if (!blog) {
+        throw new apiError(404, 'Blog not found');
+    }
+
+    blog.upvotes = blog.upvotes.filter((id) => id.toString() !== userId.toString());
+    blog.downvotes = blog.downvotes.filter((id) => id.toString() !== userId.toString());
+
+    // If no change, return an error
+    // if (prevUpvotesCount === blog.upvotes.length && prevDownvotesCount === blog.downvotes.length) {
+    //     return res.status(400).json(new apiResponse(400, {}, 'No vote to remove.'));
+    // }
+
+    await blog.save();
+
+    res.status(200).json(
+        new apiResponse(200, {
+            upvotesCount: blog.upvotes.length,
+            downvotesCount: blog.downvotes.length,
+        }, 'Vote removed successfully!')
+    );
+});
+
 export const getBlogVotes = asyncHandler(async (req,res) => {
     const { blogId } = req.params;
 

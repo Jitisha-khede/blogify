@@ -22,6 +22,8 @@ router.route('/deleteBlog/:blogId').delete(verifyJwt,blogController.deleteBlog);
 
 router.route('/voteBlog').post(verifyJwt,blogController.voteBlog);
 
+router.route('/deleteVote').delete(verifyJwt, blogController.removeVote);
+
 router.route('/getBlogVotes/:blogId').get(verifyJwt,blogController.getBlogVotes);
 
 router.route('/filterByMood').get(verifyJwt,blogController.filterByMood);

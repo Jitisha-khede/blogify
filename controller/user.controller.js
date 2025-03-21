@@ -41,7 +41,7 @@ const signupUser = asyncHandler( async (req,res)=>{
 const loginUser = asyncHandler( async(req,res)=>{
     try{
         const { login, password } = req.body;
-        console.log(req.body);
+        // console.log(req.body);
         if (!login || !password ) {
             throw new apiError(500, 'Email/Username and password is required')
         }
@@ -55,9 +55,9 @@ const loginUser = asyncHandler( async(req,res)=>{
         }
 
         const token = await User.matchPasswordAndGenerateToken(user.email,password);
-        console.log(token); 
+        // console.log(token); 
         res.cookie("token", token, {
-            httpOnly: true, 
+            httpOnly: false, 
             secure: false, 
             sameSite: "strict", 
             maxAge: 60 * 60 * 1000, 
@@ -66,7 +66,7 @@ const loginUser = asyncHandler( async(req,res)=>{
         const loggedIn=await User.findById(user._id).select("-password -refreshToken")
         console.log(loggedIn);
         res.status(200).json(
-            new apiResponse(200,{loggedIn},'user logged in successfully!')
+            new apiResponse(200,{token,loggedIn},'user logged in successfully!')
         )
     }
     catch(error){
